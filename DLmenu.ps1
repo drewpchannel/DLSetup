@@ -1,5 +1,3 @@
-# might need to install exchange online management as a pre-req... maybe check here?
-
 #load Exchange functions from other script
 . ".\ExchangeFunctions.ps1"
 

@@ -1,5 +1,6 @@
 Connect-ExchangeOnline
 
+#Check if the user is in the group
 function Check-Membership($group, $user) {
     $members = Get-DistributionGroupMember -Identity $group
     $isMember = $members | Where-Object { $_.PrimarySmtpAddress -eq $user }
@@ -27,6 +28,7 @@ function Check-UserExists($user) {
     }
 }
 
+#Adds user to AD if they exist and they're not in the group already
 function Add-DLUser($group, $user){
     if (Check-UserExists $user -and Check-Membership $group $user)
     {
