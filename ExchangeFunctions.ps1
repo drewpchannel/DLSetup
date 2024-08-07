@@ -1,16 +1,45 @@
+Connect-ExchangeOnline
+
 function Check-Membership($group, $user) {
     $members = Get-DistributionGroupMember -Identity $group
     $isMember = $members | Where-Object { $_.PrimarySmtpAddress -eq $user }
-    return $isMember
+    if ($isMember)
+    {
+        return $true
+    }
+    else 
+    {
+        return $false
+    }
 }
 
-function Add-DLUser($group, $user){
-    if (Check-Membership $group $user)
+function Check-UserExists($user) {
+    $recipient = Get-EXORecipient -Filter "EmailAddresses -eq 'SMTP:$user'"
+    if ($recipient) 
     {
-        Write-Host "User already exists in this group"
+        Write-Host "$user exists in Exchange."
+        return $true
     } 
     else 
     {
-        Add-DistributionGroupMember -Identity $group -Member $user
+        Write-Host "The email address $user does not exist in Exchange."
+        return $false
     }
+}
+
+function Add-DLUser($group, $user){
+    if (Check-UserExists $user -and Check-Membership $group $user)
+    {
+        Add-DistributionGroupMember -Identity $group -Member $user
+    } 
+}
+
+# Check if the ExchangeOnlineManagement module is installed
+$moduleName = "ExchangeOnlineManagement"
+$module = Get-Module -ListAvailable -Name $moduleName
+
+if ($module) {
+    Write-Host "The $moduleName module is installed."
+} else {
+    Install-Module -Name ExchangeOnlineManagement -Force
 }
